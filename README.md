@@ -14,7 +14,7 @@ Since composer runs in a separate container and some packages require PHP extens
 - To set working directory to `/var/www/app` after `vagrant ssh` command:  
     Add line `cd /var/www/app` to the file `/home/vagrant/.bashrc`  
 
-- To use `artisan` command after `vagrant ssh`:  
+- To use `console` command after `vagrant ssh`:  
     Add line `alias console='docker-compose -f /var/www/app/docker/docker-compose.yml exec php /var/app/bin/console'` to the file `/home/vagrant/.bashrc`
 
 - To use `composer` command:  

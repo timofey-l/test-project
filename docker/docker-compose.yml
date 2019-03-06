@@ -1,0 +1,63 @@
+version: '2.1'
+services:
+  php:
+    container_name: php-application
+    build: ./php-fpm-xdebug
+    image: php-fpm-xdebug:latest
+    env_file: ./local.env
+    environment:
+      APP_URL: $APP_URL
+    volumes:
+    - /var/www/app/code/:/var/app/
+    ports:
+    - "9000:9000"
+    networks:
+    - application
+  nginx:
+    container_name: ingress
+    image: nginx:latest
+    volumes:
+    - /var/www/app/config/nginx/snippets:/etc/nginx/snippets
+    - /var/www/app/config/nginx/conf.d:/etc/nginx/conf.d
+    - /var/www/app/code/public:/var/app/public
+    ports:
+    - "80:80"
+    networks:
+    - application
+  mysql:
+    container_name: database
+    image: mysql
+    restart: always
+    env_file: ./local.env
+    command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci',
+              '--default-authentication-plugin=mysql_native_password', "--innodb_use_native_aio=0"]
+    volumes:
+    - /var/www/app/persistent-data/mysql-data:/var/lib/mysql
+
+    networks:
+    - application
+
+  mailservice:
+    container_name: mailservice
+    image: djfarrelly/maildev
+    networks:
+      application:
+        aliases:
+        - smtpmail
+    ports:
+    - 1080:80
+    - 25
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    env_file: ./local.env
+    restart: always
+    ports:
+    - 8080:80
+    networks:
+    - application
+
+networks:
+  application:
+    driver: bridge
